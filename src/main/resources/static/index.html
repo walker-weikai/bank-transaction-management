@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Management</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>Transaction Management</h1>
+
+<!-- Add Transaction Form -->
+<h2>Add Transaction</h2>
+<form id="addTransactionForm">
+    <label for="code">Code:</label>
+    <input type="text" id="code" name="code" required><br><br>
+    <label for="type">Type:</label>
+    <input type="text" id="type" name="type"><br><br>
+    <label for="fromAccountId">From Account ID:</label>
+    <input type="text" id="fromAccountId" name="fromAccountId">
+    <label for="toAccountId">To Account ID:</label>
+    <input type="text" id="toAccountId" name="toAccountId"><br><br>
+    <label for="amount">Amount:</label>
+    <input type="number" id="amount" name="amount" step="0.01"><br><br>
+    <label for="description">Description:</label>
+    <input type="text" id="description" name="description" required><br><br>
+    <button type="submit">Add Transaction</button>
+</form>
+
+<!-- Update Transaction Form -->
+<h2>Update Transaction</h2>
+<!--<form id="updateTransactionForm" style="display:none;">-->
+<form id="updateTransactionForm">
+    <label for="transactionId">ID:</label>
+    <input type="text" id="transactionId" name="id" readonly>
+    <label for="updateCode">Code:</label>
+    <input type="text" id="updateCode" name="code" readonly><br><br>
+    <label for="updateType">Type:</label>
+    <input type="text" id="updateType" name="type"><br><br>
+    <label for="updateFromAccountId">From Account ID:</label>
+    <input type="text" id="updateFromAccountId" name="fromAccountId">
+    <label for="updateToAccountId">To Account ID:</label>
+    <input type="text" id="updateToAccountId" name="toAccountId"><br><br>
+    <label for="updateAmount">Amount:</label>
+    <input type="number" id="updateAmount" name="amount" step="0.01"><br><br>
+    <label for="updateDescription">Description:</label>
+    <input type="text" id="updateDescription" name="description" required><br><br>
+    <button type="submit">Update Transaction</button>
+</form>
+
+<!-- Transaction Table -->
+<h2>Transactions</h2>
+
+<div>
+    <label for="typeSelect">Type:</label>
+    <input type="text" id="typeSelect" name="typeSelect" value="">
+    <label for="page">Page:</label>
+    <input type="number" id="page" name="page" value="0" min="0">
+    <label for="size">Size:</label>
+    <input type="number" id="size" name="size" value="10" min="1">
+    <button onclick="loadTransactions()">Load Page</button>
+</div>
+
+<table id="transactionTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Code</th>
+        <th>Type</th>
+        <th>From Account ID</th>
+        <th>To Account ID</th>
+        <th>Amount</th>
+        <th>Description</th>
+        <th>createTime</th>
+        <th>updateTime</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Transactions will be populated here by JavaScript -->
+    </tbody>
+</table>
+
+
+
+<script>
+    document.getElementById('addTransactionForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        fetch('/api/transaction', {
+            method: 'POST',
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadTransactions();
+                    event.target.reset();
+                } else {
+                    alert(data.message);
+                }
+            });
+    });
+
+    document.getElementById('updateTransactionForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const id = formData.get('id');
+        formData.delete('id'); // Remove id from form data for update
+        fetch(`/api/transaction/${id}`, {
+            method: 'PUT',
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadTransactions();
+                    event.target.style.display = 'none';
+                } else {
+                    alert(data.message);
+                }
+            });
+    });
+
+    function loadTransactions() {
+        const type = document.getElementById('typeSelect').value;
+        const page = document.getElementById('page').value;
+        const size = document.getElementById('size').value;
+        fetch(`/api/transaction?page=${page}&size=${size}&type=${type}`)
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('transactionTable').getElementsByTagName('tbody')[0];
+                tbody.innerHTML = ''; // Clear existing rows
+                data.data.content.forEach(transaction => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${transaction.id}</td>
+                        <td>${transaction.code}</td>
+                        <td>${transaction.type}</td>
+                        <td>${transaction.fromAccountId}</td>
+                        <td>${transaction.toAccountId}</td>
+                        <td>${transaction.amount}</td>
+                        <td>${transaction.description}</td>
+                        <td>${timestampToDate(transaction.createdTime)}</td>
+                        <td>${timestampToDate(transaction.updateTime)}</td>
+                        <td>
+                            <button onclick="showUpdateForm(${transaction.id})">Update</button>
+                            <button onclick="deleteTransaction(${transaction.id})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+    }
+
+    function timestampToDate(timestamp) {
+        if (!timestamp) {
+            return "";
+        }
+        const date = new Date(timestamp); // 将时间戳转换为Date对象
+        const year = date.getFullYear(); // 获取年份
+        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 获取月份并补零
+        const day = date.getDate().toString().padStart(2, '0'); // 获取日期并补零
+        const hours = date.getHours().toString().padStart(2, '0'); // 获取小时并补零
+        const minutes = date.getMinutes().toString().padStart(2, '0'); // 获取分钟并补零
+        const seconds = date.getSeconds().toString().padStart(2, '0'); // 获取秒钟并补零
+
+        // 使用模板字符串返回格式化日期
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    function showUpdateForm(id) {
+        fetch(`/api/transaction/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                const transaction = data.data;
+                document.getElementById('transactionId').value = transaction.id;
+                document.getElementById('updateCode').value = transaction.code;
+                document.getElementById('updateType').value = transaction.type;
+                document.getElementById('updateFromAccountId').value = transaction.fromAccountId;
+                document.getElementById('updateToAccountId').value = transaction.toAccountId;
+                document.getElementById('updateAmount').value = transaction.amount;
+                document.getElementById('updateDescription').value = transaction.description;
+            })
+            .catch(error => console.error('Error loading transaction for editing:', error));
+    }
+
+    function findTransactionById(id) {
+        return fetch(`/api/transaction/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    return data.data;
+                } else {
+                    alert(data.message);
+                    return null;
+                }
+            });
+    }
+
+    function deleteTransaction(id) {
+        fetch(`/api/transaction/${id}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadTransactions();
+                } else {
+                    alert(data.message);
+                }
+            });
+    }
+
+    // Load transactions on page load
+    window.onload = loadTransactions;
+</script>
+</body>
+</html>
