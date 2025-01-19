@@ -187,10 +187,13 @@ Apifox 是 API 文档、API 调试、API Mock、API 自动化测试一体化协�
 #### 压测数据生成
 
 * 例如：id小于50000的随机整数
+
   ![img.png](img/apifix_data_id.png)
 * 例如：页面大小5的倍数且小于100，尽量模拟真实场景
+
   ![img.png](img/apifox_data_size.png)
 * 例如：交易描述 交易类型apifox提供了数据源模版
+
   ![img.png](img/apifox_data_add.png)
 
 #### 压测报告
@@ -212,7 +215,7 @@ Apifox 是 API 文档、API 调试、API Mock、API 自动化测试一体化协�
 
 ## 页面功能展示
 
-不擅长前端开，做到尽可能实现最基本页面功能
+不擅长前端开发，做到尽可能实现最基本页面功能
 
 * 新增交易 有参数校验错误提交会提示弹窗
 
