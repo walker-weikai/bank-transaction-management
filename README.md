@@ -214,7 +214,8 @@ Apifox 是 API 文档、API 调试、API Mock、API 自动化测试一体化协�
 
 不擅长前端开，做到尽可能实现最基本页面功能
 
-* 新增交易 提交有参数校验提示弹窗
+* 新增交易 有参数校验错误提交会提示弹窗
+
   ![img.png](img/add_view.png)
 
   ![img.png](img/validation_alert.png)
