@@ -38,11 +38,11 @@ docker容器部署
 ### 架构
 
 * 接口形式：遵循RESTful API设计原则
-* 代码分层结构：从controller层，业务逻辑服务层，数据库数据层，已实现不错的扩展性和可维护性
+* 代码分层结构：从controller接口层，service业务逻辑服务层，dao数据库数据层，以此来实现不错的扩展性和可维护性
 
 ### 技术
 
-* java21、SpringBoot框架、maven构建、h2数据库、Docker容器化、html+js前端页面
+* java(jdk21)、SpringBoot框架、maven构建、H2数据库、Docker容器化、html+js前端页面、ApiFox压测(https://app.apifox.com/)
 
 ### 数据相关设计
 
@@ -136,16 +136,28 @@ docker容器部署
     自定义业务异常BizException，自定义异常信息、标准化错误返回形式，方便前端标准处理。
     为创建重复交易或删除不存在的交易等场景实现错误处理
 
-### 缓存机制
+### 性能设计
 
-#### SpringCache+Caffeine
+### 查询索引
+
+  ``` java
+    @Table(indexes = {@Index(name = "idx_code", columnList = "code", unique = true)//唯一滴
+        , @Index(name = "idx_type", columnList = "type")})
+    public class Transaction {
+    }
+  ```
+
+* 索引idx_code 作用：交易重复提交会查询code字段
+* 索引idx_type 作用：交易类型type需要支持筛选分页查询
+
+#### 缓存SpringCache+Caffeine
 
 * 引用SpringCache 使用 `@Cacheable`, `@CachePut`, `@CacheEvict` 和 `@Caching` 注解快速完成缓存逻辑。
 * 使用 Caffeine 作为本地缓存，Caffeine默认配置策略，提供单数据实体、批量存储分页两种CacheManager 并分别支持两个过期时间30分钟和2小时
 * 利用注解实现了数据变动及时清缓存和刷新缓存的基本逻辑，尽量避免系统访问脏数据
 * 当前场景下，内存数据库H2+本地内存缓存Caffeine起到冗余存储，基本是用空间换时间的效果
 
-#### BloomFilter
+#### 布隆过滤器BloomFilter
 
 * 由于数据未持久化，重启系统不需要初始化数据，很适合用布隆过滤器提示系统性能
 * 引用guava中布隆过滤器，对交易实体单数据查询做请求过滤，理论上可以提升应对大量空查询的能力
@@ -180,23 +192,24 @@ Apifox 是 API 文档、API 调试、API Mock、API 自动化测试一体化协�
 
 #### 压测报告
 
-**查询压力压测**  
-分页和单实体查询接口共同测试
-![img.png](img/apifox_test_get.png)
-服务器状态
-![img_1.png](img/yun_state_get.png)
+**查询压力压测**
+
+* 分页和单实体查询接口共同测试
+  ![img.png](img/apifox_test_get.png)
+* 服务器状态
+  ![img.png](img/yun_state_get.png)
 
 **业务逻辑压力压测**
 
-简单模拟进入管理页面真实场景。分页查询、新增交易、编辑回填、编辑提交、删除后新增，列表页刷新和筛选
-![img.png](img/apifix_config.png)
-![img.png](img/apifox_test_biz.png)
-服务器状态
-![img.png](img/yun_test_biz.png)
+* 简单模拟进入管理页面真实场景。分页查询、新增交易、编辑回填、编辑提交、删除后新增，列表页刷新和筛选
+  ![img.png](img/apifix_config.png)
+  ![img.png](img/apifox_test_biz.png)
+* 服务器状态
+  ![img.png](img/yun_test_biz.png)
 
-## 功能展示
+## 页面功能展示
 
-  前端不擅长，目的只实现最基本页面功能
+不擅长前端开，做到尽可能实现最基本页面功能
 
 * 新增交易 提交有参数校验提示弹窗
   ![img.png](img/add_view.png)

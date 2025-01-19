@@ -9,6 +9,7 @@ import lombok.ToString;
 /**
  * 交易实体
  * demo简化版
+ *
  * @author: weikai
  */
 @NoArgsConstructor
@@ -16,7 +17,8 @@ import lombok.ToString;
 @Data
 @ToString
 @Entity
-@Table(indexes = {@Index(name = "idx_code", columnList = "code")})
+@Table(indexes = {@Index(name = "idx_code", columnList = "code", unique = true)//唯一滴
+        , @Index(name = "idx_type", columnList = "type")})
 public class Transaction {
 
     /**
