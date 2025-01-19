@@ -8,6 +8,8 @@
 
 目的：创建一个简单的银行系统交易管理应用程序。该应用程序应允许用户记录、查看和管理财务交易。
 
+[演示视频查看下载链接](https://github.com/walker-weikai/bank-transaction-management/blob/main/%E4%BA%A4%E6%98%93%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E6%BC%94%E7%A4%BA%E5%8E%8B%E7%BC%A9%202.mov)
+
 ### 线上访问
 
 在线演示访问地址（阿里云服务器2c2g配置，docker部署）：
