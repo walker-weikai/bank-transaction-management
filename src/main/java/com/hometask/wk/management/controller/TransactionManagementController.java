@@ -50,7 +50,7 @@ public class TransactionManagementController {
                                               @RequestParam(value = "fromAccountId", required = false) String fromAccountId,
                                               @RequestParam(value = "toAccountId", required = false) String toAccountId,
                                               @RequestParam(value = "amount", required = false) @DecimalMin(message = "amount必须大于0.01", value = "0.01") String amount,
-                                              @RequestParam(value = "description", required = true) @Length(message = "description长度必须大于2小于20", min = 2, max = 20) String description,
+                                              @RequestParam(value = "description", required = true) @Length(message = "description长度必须大于2小于20", min = 2, max = 50) String description,
                                               HttpServletRequest request) {
         Transaction transaction = new Transaction();
         transaction.setCode(code);

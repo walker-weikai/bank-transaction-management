@@ -6,9 +6,32 @@
 
 目的：创建一个简单的银行系统交易管理应用程序。该应用程序应允许用户记录、查看和管理财务交易。
 
+### 线上访问
+
 在线演示访问地址（阿里云服务器2c2g配置，docker部署）：
 
-访问路径 : http://39.104.22.4/index.html
+访问路径: http://39.104.22.4/index.html
+
+### 本地运行
+
+本地启动springboot
+
+访问路径: http://localhost:8080/index.html
+
+### 容器部署
+
+docker容器部署
+
+1. 构建Docker镜像：
+    ```sh
+    docker build -t bank-transaction-management-1.0 .
+    ```
+
+2. 运行Docker容器：
+
+    ```sh
+    docker run -d -p 80:8080 bank-transaction-management-1.0
+     ```
 
 ## 设计方案
 
@@ -141,18 +164,56 @@
     * 单元测试具体见单测代码，做到方法覆盖率100%和成功率100%
 
 * 对service层方法覆盖率：100%
-  ![img.png](img/img.png)
+  ![img.png](img/service_test.png)
 
 * controller层接口覆盖率：100%
 
-  ![img.png](img.png)
-
+  ![img.png](img/controller_test.png)
 
 ### 压力测试
 
+使用Apifox，由于时间问题，可以提供较规范的随机数据
+Apifox 是 API 文档、API 调试、API Mock、API 自动化测试一体化协作平台，定位 Postman + Swagger + Mock + JMeter
 
+#### 压测数据生成
 
+* 例如：id小于50000的随机整数
+  ![img.png](img/apifix_data_id.png)
+* 例如：页面大小5的倍数且小于100，尽量模拟真实场景
+  ![img.png](img/apifox_data_size.png)
+* 例如：交易描述 交易类型apifox提供了数据源模版
+  ![img.png](img/apifox_data_add.png)
 
+#### 压测报告
+
+**查询压力压测**  
+分页和单实体查询接口共同测试
+![img.png](img/apifox_test_get.png)
+服务器状态
+![img_1.png](img/yun_state_get.png)
+
+**业务逻辑压力压测**
+
+简单模拟进入管理页面真实场景。分页查询、新增交易、编辑回填、编辑提交、删除后新增，列表页刷新和筛选
+![img.png](img/apifix_config.png)
+![img.png](img/apifox_test_biz.png)
+服务器状态
+![img.png](img/yun_test_biz.png)
+
+## 功能展示
+
+  前端不擅长，目的只实现最基本页面功能
+
+* 新增交易 提交有参数校验提示弹窗
+  ![img.png](img/add_view.png)
+
+  ![img.png](img/validation_alert.png)
+
+* 修改交易，交易业务唯一码不能修改（防止重复提交），会刷新修改时间，参数校验同新增
+  ![img.png](img/update_view.png)
+
+* 分页查询，支持交易类型type筛选
+  ![img.png](img/page_view.png)
 
 ## 总结
 
