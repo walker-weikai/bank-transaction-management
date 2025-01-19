@@ -157,10 +157,10 @@ docker容器部署
     * 引用JUnit和Mockito进行单元测试
     * 单元测试具体见单测代码，做到方法覆盖率100%和成功率100%
 
-* 对service层方法覆盖率：100%
+* 对service层方法：覆盖率100%和成功率100%
   ![img.png](img/service_test.png)
 
-* controller层接口覆盖率：100%
+* controller层接口：覆盖率100%和成功率100%
 
   ![img.png](img/controller_test.png)
 
